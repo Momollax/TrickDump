@@ -30,13 +30,6 @@ jobs:
       - name: Install dependencies
         run: shards install --without-development --release
 
-      - name: Run Windows Build x64
-        if: matrix.os == 'windows'
-        run: |
-          shards install --without-development --release
-          shards build --release --static
-          Set-ExecutionPolicy RemoteSigned -Scope Process
-          Compress-Archive -Path bin/TrickDump.exe -DestinationPath bin/TrickDump-windows.zip
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
