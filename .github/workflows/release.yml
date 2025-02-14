@@ -1,0 +1,48 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+  pull_request:
+
+
+jobs:
+  build:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["windows"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install Crystal
+        uses: crystal-lang/install-crystal@v1
+        with:
+          crystal: latest
+
+      - name: Install dependencies
+        run: shards install --without-development --release
+
+      - name: Run Windows Build x64
+        if: matrix.os == 'windows'
+        run: |
+          shards install --without-development --release
+          shards build --release --static
+          Set-ExecutionPolicy RemoteSigned -Scope Process
+          Compress-Archive -Path bin/TrickDump.exe -DestinationPath bin/TrickDump-windows.zip
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            bin/TrickDump-linux.gz
+            bin/TrickDump-macos.gz
+            bin/TrickDump-windows.zip
+            LICENSE.txt

@@ -3,3 +3,7 @@ version: 0.1.0
 dependencies:
   zip64:
     github: crystal-garage/crystal-zip64
+
+targets:
+  CrystalDump:
+    main: lock.cr
