@@ -31,9 +31,6 @@ jobs:
       - name: Build executable
         run: shards build --release
 
-      - name: Run executable (help)
-        run: bin/TrickDump --help
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
