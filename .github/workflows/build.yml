@@ -2,12 +2,13 @@ name: build
 
 on:
   push:
+    tags:
+      - "v*"
   pull_request:
-  
 
 jobs:
   build:
-    name: ${{ matrix.os }}
+    name: Build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}-latest
     strategy:
       fail-fast: false
@@ -28,11 +29,18 @@ jobs:
       - name: Install dependencies
         run: shards install --without-development --release
 
-      - name: Build executable
-        run: shards build --release
+      - name: Build Windows Binaries
+        if: matrix.os == 'windows'
+        run: |
+          crystal build lock.cr --release -o bin/lock.exe
+          crystal build shock.cr --release -o bin/shock.exe
+          crystal build barrel.cr --release -o bin/barrel.exe
+          crystal build trick.cr --release -o bin/trick.exe
+          
+          Compress-Archive -Path bin/* -DestinationPath bin/CrystalTools-windows.zip
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/v') # Vérifie si c'est un tag
         with:
-          name: TrickDump-${{ matrix.os }}
-          path: bin/${{ matrix.os == 'windows' && 'TrickDump.exe' || 'TrickDump' }}
+          files: bin/CrystalTools-windows.zip
