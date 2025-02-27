@@ -1,9 +1,19 @@
 name: TrickDump
 version: 0.1.0
+
 dependencies:
   zip64:
     github: crystal-garage/crystal-zip64
 
 targets:
-  CrystalDump:
+  lock:
     main: lock.cr
+
+  shock:
+    main: shock.cr
+
+  barrel:
+    main: barrel.cr
+
+  trick:
+    main: trick.cr

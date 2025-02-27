@@ -29,18 +29,21 @@ jobs:
       - name: Install dependencies
         run: shards install --without-development --release
 
-      - name: Build Windows Binaries
+      - name: Ensure bin directory exists
+        run: mkdir -p bin
+
+      - name: Build Windows Binaries (Sequentially)
         if: matrix.os == 'windows'
         run: |
-          crystal build lock.cr --release -o bin/lock.exe
-          crystal build shock.cr --release -o bin/shock.exe
-          crystal build barrel.cr --release -o bin/barrel.exe
-          crystal build trick.cr --release -o bin/trick.exe
+          crystal build ./lock.cr --release -o bin/lock.exe || exit 1
+          crystal build ./shock.cr --release -o bin/shock.exe || exit 1
+          crystal build ./barrel.cr --release -o bin/barrel.exe || exit 1
+          crystal build ./trick.cr --release -o bin/trick.exe || exit 1
           
           Compress-Archive -Path bin/* -DestinationPath bin/CrystalTools-windows.zip
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/v') # Vérifie si c'est un tag
+        if: startsWith(github.ref, 'refs/tags/v')
         with:
           files: bin/CrystalTools-windows.zip
